@@ -1,11 +1,11 @@
-name: "MyLabJournal"
+name: "BayesianTRI"
 navbar:
-  title: "MyLabJournal"
+  title: "BayesianTRI"
   left:
-    - text: "Home"
+    - text: "Introdução"
       href: index.html
-    - text: "Journal"
-      href: Journal.html
+    - text: "Desenvolvimento"
+      href: Trabalho.html
     - text: "Links"
       href: Links.html
 output_dir: "docs"
