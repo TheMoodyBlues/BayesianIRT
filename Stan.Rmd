@@ -15,6 +15,29 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+library(tidyverse)
+library(brms)
+```
+
+
+```{r, include = F}
+#Respostas
+data <- read_csv2("respostas.csv")
+perguntas <- colnames(data)
+colnames(data) <- c(paste0("i",1:13), paste0("f",1:3))
+
+#Gabarito
+gab <- read_csv2("gabarito.csv", col_names = FALSE)
+colnames(gab) <- c(paste0("i",1:13))
+
+#Desconsidera as linhas incompletas
+data.NA <- data[complete.cases(data), ]
+
+#Correção
+data.f <- ltm::mult.choice(data.NA[,1:13],as.numeric(gab))
+```
+
+```{r}
 data.l = data.f %>% 
   as.data.frame() %>% 
   rownames_to_column(var = "id") %>% 
@@ -24,20 +47,29 @@ data.l = data.f %>%
 ```{r}
 formula_va_2pl <- bf(resp ~ exp(logalpha) * eta, eta ~ 1 + (1 | i | item) +
   (1 | id), logalpha ~ 1 + (1 | i | item), nl = TRUE)
+```
 
+
+```{r}
 # specify some weakly informative priors
 prior_va_2pl <- prior("normal(0, 5)", class = "b", nlpar = "eta") +
   prior("normal(0, 1)", class = "b", nlpar = "logalpha") +
   prior("constant(1)", class = "sd", group = "id", nlpar = "eta") +
   prior("normal(0, 3)", class = "sd", group = "item", nlpar = "eta") +
   prior("normal(0, 1)", class = "sd", group = "item", nlpar = "logalpha")
+```
 
+
+```{r}
 # fit the 2PL model this models throws some convergence warnings which are
 # false positives and can be safely ignored
 fit_va_2pl <- brm(formula = formula_va_2pl, data = data.l,
   family = brmsfamily("bernoulli", "logit"), prior = prior_va_2pl, seed = 1234,
-  file = "models/fit_va_2pl")
+  file = "models\fit_va_2pl")
+```
 
+
+```{r}
 # obtain some basic summaries
 summary(fit_va_2pl)
 # No figure in paper
