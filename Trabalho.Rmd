@@ -48,6 +48,10 @@ questoes <- colSums(data.f)
 barplot(questoes)
 ```
 
+No modelo é assumido que cada sujeito possui uma habilidade (ponto ideal) denotada $\theta_j (K \times 1)$, e que cada item possui um parâmetro de dificuldade $\alpha_i$ e um parâmetro de discriminação $\beta_i (K \times 1)$. A escolha observada pelo sujeito $j$ no item $i$ é a matriz de dados observada que é $(\mathcal{I} \times j)$. A escolha é ditada por uma utilidade não observada:
+
+$$z_{i,j} = - \alpha_i + \beta_i'\theta_j + \varepsilon_{i,j},$$ Onde: $$\varepsilon_{i,j} \sim \mathcal{N}(0,1)$$
+
 ## Análise original
 
 ### Mirt
@@ -73,10 +77,6 @@ library(pscl)
 ```
 
 Médodo de amostragem utilizado: Amostrador de Gibbs
-
-O algoritmo gera amostras para as características latentes e parâmetros de itens, e funciona da seguinte maneira:
-
-Para $y_{ij} = 1$,$$y_{ij}^* \sim \mathcal{N}(x_i' \beta_j - \alpha_j, 1)\mathcal{I}(y_{ij}^* \geq 0)$$ e para $y_{ij}=0$ amostramos $$y_{ij}^* \sim \mathcal{N}( x_i' \beta_j - \alpha_j, 1)\mathcal{I}(y_{ij}^* < 0)$$ onde $\mathcal{I}$ é uma função indicadora que avalia para um se seu argumento é verdadeiro e zero caso contrário. Dado o $y^*\ latente$, as distribuições condicionais para $x$ e $(\beta,\alpha)$ são extremamente simples de serem amostradas.
 
 ```{r}
 a <- rollcall(data.f)
@@ -108,16 +108,6 @@ library(MCMCpack)
 ```
 
 Médodo de amostragem utilizado: Amostrador de Gibbs
-
-No modelo é assumido que cada sujeito possui uma habilidade (ponto ideal) denotada $\theta_j (K \times 1)$, e que cada item possui um parâmetro de dificuldade $\alpha_i$ e um parâmetro de discriminação $\beta_i (K \times 1)$. A escolha observada pelo sujeito $j$ no item $i$ é a matriz de dados observada que é $(\mathcal{I} \times j)$. A escolha é ditada por uma utilidade não observada:
-
-$$z_{i,j} = - \alpha_i + \beta_i'\theta_j + \varepsilon_{i,j},$$ Onde: $$\varepsilon_{i,j} \sim \mathcal{N}(0,1)$$
-
-Prioris: $$\theta_{j,k} \sim \mathcal{N}(0,1)$$
-
-$$\alpha_i, \beta_i \sim \mathcal{N}_{(K+1)} (b_{0,i},B_{0,i})$$
-
-onde $B_{0,1}$ é uma matriz diagonal
 
 ```{r}
 post1 <- MCMCirtKd(data.f, dimensions = 1,  store.item = T)
