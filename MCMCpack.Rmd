@@ -38,13 +38,23 @@ post1 <- MCMCirtKd(data.f, dimensions = 1,  store.item = T)
 
 sum <- summary(post1)
 
-coefs <- sum$statistics
+coefs.stats <- sum$statistics
 
-coefs[grepl("alpha", rownames(coefs)),]
-coefs[grepl("beta", rownames(coefs)),]
+(alphas <- coefs.stats[grepl("alpha", rownames(coefs.stats)),])
+(betas <- coefs.stats[grepl("beta", rownames(coefs.stats)),])
 
-coef
+coef.mcmc <- data.frame("Dificuldade" =  alphas[,1], "Discriminação" = betas[,1])
 
-coda::HPDinterval(post1)
-plot(post1)
+x <- seq(-6,6, by = 0.1)
+
+inlogit <- function(alpha, beta, x) 1/(1+exp(-(alpha+beta*x)))
+
+par(mfrow = c(2,4))
+for(i in 1:13){
+  plot(x,
+       inlogit(coef.mcmc$Dificuldade[i],coef.mcmc$Discriminação[i], x),
+       type = "l",
+       main = paste("Item", i),
+       ylab = "P(theta)")
+}
 ```
