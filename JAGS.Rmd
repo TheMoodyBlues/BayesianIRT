@@ -28,7 +28,6 @@ data.list <- data.f %>%
   
 
 data.list$N <- length(data.list$resp)
-## Inserindo o número de grupos
 data.list$Nid <- length(unique(data.list$id))
 data.list$Nitem <- length(unique(data.list$item))
 
@@ -38,7 +37,7 @@ cat("model{
     ## cada resposta
     for(n in 1:N){
       resp[n] ~ dbern(z[n])
-      logit(z[n]) <- -alpha[item[n]] + beta[item[n]]*theta[id[n]] + erro[n]
+      logit(z[n]) <- -alpha[item[n]] + beta[item[n]]*theta[id[n]]
     }
     
     
@@ -52,17 +51,13 @@ cat("model{
       alpha[it] ~ dnorm(0, 1)
       beta[it] ~ dnorm(0, 1)
     }
-    
-    erro ~ dnorm(0,1)
-    }", file="sim.jags")
-
-
+}", file="sim.jags")
 
 
 sim.jags <- jags.model(file = "sim.jags",
                        data = data.list, n.chains = 3, n.adapt = 1000)
 
-update(sim.jags, 10000)
+update(sim.jags, 100)
 
 fit.jags <- coda.samples(model=sim.jags,
                          n.iter=10, thin=10,
@@ -82,12 +77,24 @@ fit.jags <- coda.samples(
 sum.jags <- summary(fit.jags)
 #plot(fit.jags)
 
-coefs.jags <- sum.jags$statistics
+jags.stats <- sum.jags$statistics
 
-coefs.jags[grepl("alpha", rownames(coefs.jags)),]
-coefs.jags[grepl("beta", rownames(coefs.jags)),]
+(alphas <- jags.stats[grepl("alpha", rownames(jags.stats)),])
+(betas <- jags.stats[grepl("beta", rownames(jags.stats)),])
 
+coef.jags <- data.frame("Dificuldade" =  alphas[,1], "Discriminação" = betas[,1])
 
+x <- seq(-6,6, by = 0.1)
 
+inlogit <- function(alpha, beta, x) 1/(1+exp((-alpha+beta*x)))
+
+par(mfrow = c(2,4))
+for(i in 1:13){
+  plot(x,
+       inlogit(coef.jags$Dificuldade[i],coef.jags$Discriminação[i], x),
+       type = "l",
+       main = paste("Item", i),
+       ylab = "P(theta)")
+}
 ```
 

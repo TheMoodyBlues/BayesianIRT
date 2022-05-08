@@ -33,27 +33,19 @@ a <- rollcall(data.f)
 ideal <- ideal(a, store.item = T, maxiter = 1e4,
                normalize = T)
 
+coef.pscl <- as.data.frame(ideal$betabar)
 
-r <- list("Vote 1" = 0,
-          "Vote 2" = 0,
-          "Vote 3" = 0,
-          "Vote 4" = 0,
-          "Vote 5" = 0,
-          "Vote 6" = 0,
-          "Vote 7" = 0,
-          "Vote 8"  = 0,
-          "Vote 9" = 0,
-          "Vote 10" = 0,
-          "Vote 11" = 0,
-          "Vote 12" = 0,
-          "Vote 13" = 0)
+inlogit <- function(alpha, beta, x) 1/(1+exp((-alpha+beta*x)))
 
-cl <- constrain.items(a, x = r)
+x <- seq(-6,6, by = 0.1)
 
-ideal2 <- ideal(a, store.item = T, maxiter = 1e4,
-               normalize = T, priors = cl)
+par(mfrow = c(2,4))
+for(i in 1:13){
+  plot(x,
+       inlogit(coef.pscl$Difficulty[i],coef.pscl$`Discrimination D1`[i], x),
+       type = "l",
+       main = paste("Item", i),
+       ylab = "P(theta)")
+}
 
-
-ideal2$betabar
-plot(ideal)
 ```
