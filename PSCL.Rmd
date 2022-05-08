@@ -1,0 +1,59 @@
+---
+title: "PSCL"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    collapsed: false
+    number_sections: false
+    toc_depth: 1
+    #code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### PSCL
+
+```{r}
+# Political Science Computational Laboratory
+
+library(pscl)
+```
+
+Médodo de amostragem utilizado: Amostrador de Gibbs
+
+O algoritmo gera amostras para as características latentes e parâmetros de itens, e funciona da seguinte maneira:
+
+Para $y_{ij} = 1$, $$y_{ij}^* \sim \mathcal{N}(x_i' \beta_j - \alpha_j, 1)\mathcal{I}(y_{ij}^* \geq 0)$$ e para $y_{ij}=0$ amostramos $$y_{ij}^* \sim \mathcal{N}( x_i' \beta_j - \alpha_j, 1)\mathcal{I}(y_{ij}^* < 0)$$ onde $\mathcal{I}$ é uma função indicadora que avalia para um se seu argumento é verdadeiro e zero caso contrário. Dado o $y^*\ latente$, as distribuições condicionais para $x$ e $(\beta,\alpha)$ são extremamente simples de serem amostradas.
+
+```{r}
+a <- rollcall(data.f)
+ideal <- ideal(a, store.item = T, maxiter = 1e4,
+               normalize = T)
+
+
+r <- list("Vote 1" = 0,
+          "Vote 2" = 0,
+          "Vote 3" = 0,
+          "Vote 4" = 0,
+          "Vote 5" = 0,
+          "Vote 6" = 0,
+          "Vote 7" = 0,
+          "Vote 8"  = 0,
+          "Vote 9" = 0,
+          "Vote 10" = 0,
+          "Vote 11" = 0,
+          "Vote 12" = 0,
+          "Vote 13" = 0)
+
+cl <- constrain.items(a, x = r)
+
+ideal2 <- ideal(a, store.item = T, maxiter = 1e4,
+               normalize = T, priors = cl)
+
+
+ideal2$betabar
+plot(ideal)
+```

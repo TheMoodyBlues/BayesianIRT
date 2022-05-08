@@ -1,0 +1,93 @@
+---
+title: "JAGS"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    collapsed: false
+    number_sections: false
+    toc_depth: 1
+    #code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("rjags")
+
+data.list <- data.f %>% 
+  as.data.frame() %>% 
+  rownames_to_column(var = "id") %>%
+  pivot_longer(i1:i13,
+               names_to = "item",
+               values_to = "resp") %>% 
+  mutate(item = substr(item, 2,3)) %>% 
+  as.list()
+  
+
+data.list$N <- length(data.list$resp)
+## Inserindo o número de grupos
+data.list$Nid <- length(unique(data.list$id))
+data.list$Nitem <- length(unique(data.list$item))
+
+
+cat("model{
+    
+    ## cada resposta
+    for(n in 1:N){
+      resp[n] ~ dbern(z[n])
+      logit(z[n]) <- -alpha[item[n]] + beta[item[n]]*theta[id[n]] + erro[n]
+    }
+    
+    
+    ## Para o individuo ind, i = 1, ..., Nid
+    for(ind in 1:Nid){
+      theta[ind] ~ dnorm(0, 1)
+    }
+    
+    ## Para o item it, i = 1, ..., Nitem
+    for(it in 1:Nitem){
+      alpha[it] ~ dnorm(0, 1)
+      beta[it] ~ dnorm(0, 1)
+    }
+    
+    erro ~ dnorm(0,1)
+    }", file="sim.jags")
+
+
+
+
+sim.jags <- jags.model(file = "sim.jags",
+                       data = data.list, n.chains = 3, n.adapt = 1000)
+
+update(sim.jags, 10000)
+
+fit.jags <- coda.samples(model=sim.jags,
+                         n.iter=10, thin=10,
+                         variable.names=c("alpha","beta", "theta"))
+
+
+save(file="jags.Rdata", list="sim.jags")
+quit()
+
+fit.jags <- coda.samples(
+  sim.jags,
+  variable.names = c("alpha","beta", "theta"),
+  n.iter = 10000,
+  thin=10
+)
+
+sum.jags <- summary(fit.jags)
+#plot(fit.jags)
+
+coefs.jags <- sum.jags$statistics
+
+coefs.jags[grepl("alpha", rownames(coefs.jags)),]
+coefs.jags[grepl("beta", rownames(coefs.jags)),]
+
+
+
+```
+

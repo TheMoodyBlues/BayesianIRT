@@ -1,0 +1,50 @@
+---
+title: "MCMCpack"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    collapsed: false
+    number_sections: false
+    toc_depth: 1
+    #code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### MCMCpack
+
+```{r}
+# Markov Chain Monte Carlo for K-Dimensional Item Response Theory Model
+library(MCMCpack)
+```
+
+Médodo de amostragem utilizado: Amostrador de Gibbs
+
+No modelo é assumido que cada sujeito possui uma habilidade (ponto ideal) denotada $\theta_j (K \times 1)$, e que cada item possui um parâmetro de dificuldade $\alpha_i$ e um parâmetro de discriminação $\beta_i (K \times 1)$. A escolha observada pelo sujeito $j$ no item $i$ é a matriz de dados observada que é $(\mathcal{I} \times j)$. A escolha é ditada por uma utilidade não observada:
+
+$$z_{i,j} = - \alpha_i + \beta_i'\theta_j + \varepsilon_{i,j},$$ Onde: $$\varepsilon_{i,j} \sim \mathcal{N}(0,1)$$
+
+Prioris: $$\theta_{j,k} \sim \mathcal{N}(0,1)$$
+
+$$\alpha_i, \beta_i \sim \mathcal{N}_{(K+1)} (b_{0,i},B_{0,i})$$
+
+onde $B_{0,1}$ é uma matriz diagonal
+
+```{r}
+post1 <- MCMCirtKd(data.f, dimensions = 1,  store.item = T)
+
+sum <- summary(post1)
+
+coefs <- sum$statistics
+
+coefs[grepl("alpha", rownames(coefs)),]
+coefs[grepl("beta", rownames(coefs)),]
+
+coef
+
+coda::HPDinterval(post1)
+plot(post1)
+```
