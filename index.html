@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Bayesian IRT</title>
+
+<script src="site_libs/header-attrs-2.13/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">BayesianTRI</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Introdução</a>
+</li>
+<li>
+  <a href="Links.html">Links</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Bayesian IRT</h1>
+
+</div>
+
+
+<style type="text/css">
+.title {
+  display: none
+  
+  
+}
+
+#getting-started img {
+  margin-right: 10px
+  
+  
+}
+
+</style>
+<p>::: {.row style=“padding-top: 30px</p>
+<p>“} # <strong>Teoria de Resposta ao Item: explorando abordagens
+bayesianas</strong></p>
+<div class="col-sm-8">
+<p>A teoria de resposta ao item (TRI), também conhecida como teoria do
+traço latente, é utilizada para o design, análise e pontuação de testes,
+questionários e instrumentos semelhantes que medem habilidades, atitudes
+ou outras variáveis.</p>
+<p>É uma metodologia que se baseia na relação entre o desempenho dos
+indivíduos em um item de teste e os níveis de desempenho dos
+participantes do teste em uma medida geral, considerando a habilidade
+que o item foi projetado para medir. Vários modelos estatísticos
+diferentes são usados para representar as características do item e do
+participante do teste. Ao contrário de alternativas mais simples, não
+pressupõe que cada item seja igualmente difícil.</p>
+<div id="objetivo" class="section level2">
+<h2>Objetivo</h2>
+<p>Vamos utilizar diferentes modelos bayesianos para replicar uma
+análise originalmente feita com o pacote <a
+href="https://cran.r-project.org/web/packages/mirt/index.html">mirt</a>.
+Os dados utilizados são de um questionário de conhecimento geral sobre
+filmes, com mais de 900 respostas, desenvolvido em conjunto pela turma
+na matéria de teoria de resposta ao item.</p>
+</div>
+</div>
+<div class="col-sm-4">
+<p><img src="images/cinema-icon.jpg" /></p>
+</div>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<body>
+<div class="w3-container">
+<h2>
+Itens do Questionário
+</h2>
+<p>
+1- Em Toy Story 3, “Andy tem 17 anos e está prestes a ir para a
+faculdade. Desta forma, precisa arrumar o quarto e definir o que irá
+para o lixo e o que será guardado no sótão. Seus antigos brinquedos,
+entre eles Buzz Lightyear, Jessie e o Sr. Cabeça de Batata, são
+separados para serem guardados no sótão. Entretanto,uma confusão faz com
+que a mãe de Andy os coloque no lixo. Woody, que será levado por Andy
+para a faculdade, decide salvá-los.” Qual destino o Andy define para os
+brinquedos no final do filme?
+</p>
+<hr>
+</div>
+<article class="w3-container">
+<p>
+2- Corra que a Polícia Vem Aí! é um filme estadunidense de 1988, do
+gênero comédia, dirigido por David Zucker e estrelado por Leslie
+Nielsen. Trata-se de uma comédia no estilo pastelão, com diversas piadas
+de cena e trocadilhos de duplo sentido. O filme é baseado em uma série
+de TV estrelada pelo próprio Nielsen. Qual é o nome dessa série?
+</p>
+<hr>
+</article>
+<section class="w3-container">
+<p>
+3- Um dos principais diretores do gênero de Ficção Científica nasceu no
+Reino Unido e foi descrito pelo produtor Michael Deeley como “Melhor
+olho no ramo”. Dentre os títulos dirigidos estão Alien, Blade Runner e
+Perdido em Marte. Qual é o nome do diretor?
+</p>
+<hr>
+</section>
+<div class="w3-container">
+<p>
+4- No mundo pós-apocalíptico de “Bird Box”, Malorie tenta fugir com seus
+filhos para um local onde possam viver em segurança, mas para chegar até
+o refúgio eles não podem utilizar um de seus sentidos. De qual sentido a
+família abdica durante a viagem?
+</p>
+<hr>
+</div>
+<div class="w3-container">
+<p>
+5- Em Vingadores Guerra Infinita (2018), o personagem Thanos,está em
+busca das seis joias do infinito. Aquele que tiver a posse de todas as
+joias e a manopla, uma espécie de peça protetora das mãos, pode enfim
+realizar qualquer desejo. Qual é o objetivo de Thanos ao adquirir todos
+as joias do infinito?
+</p>
+<hr>
+</div>
+<div class="w3-container">
+<p>
+6- Winter on Fire: A Luta pela Liberdade da Ucrânia” é um documentário
+de 2015 sobre os protestos que explodiram no país, de 2013 a 2014. Qual
+o nome do movimento de liberdade retratado no documentário?
+</p>
+<hr>
+</div>
+<div class="w3-container">
+<p>
+7- O filme ““Viagem à Lua”” (1902), foi inspirado nos livros ““De la
+Terre à la Lune”“, de Julio Verne, e”“The First Men in the Moon”“, de H.
+G. Wells. Narra a história de um grupo de cinco astrônomos que viajam à
+Lua numa cápsula lançada por um canhão gigante, onde são capturados
+pelos selenitas. Qual é o gênero do filme”“Viagem à lua”“?
+</p>
+<hr>
+</div>
+<div class="w3-container">
+<p>
+8- Qual filme retratou o enfrentamento inglês contra a inteligência
+alemã, resolvendo a criptografia da máquina “Enigma”?
+</p>
+<hr>
+</div>
+<div class="w3-container">
+<p>
+9- O inverno rigoroso é pano de fundo para diversos acontecimentos dessa
+série, com a famosa frase dita em todas as oito temporadas por diversos
+personagens: “winter is coming” (o inverno está chegando). Qual é o nome
+dessa série?
+</p>
+<hr>
+</div>
+<div class="w3-container">
+<p>
+10- No começo do filme “Vingadores: Ultimato”, o grande vilão Thanos é
+morto por um dos heróis da trama. Quem é este herói?
+</p>
+<hr>
+</div>
+<div class="w3-container">
+<p>
+11- Em Hanna Montana: O Filme, Miley Stewart é uma adolescente que
+convive com seus amigos, família e frequenta a escola, entretanto ela
+guarda um segredo que a força tomar algumas decisões. Qual é o segredo
+de Miley Stewart?
+</p>
+<hr>
+</div>
+<div class="w3-container">
+<p>
+12- “A guerra não era minha. Você me chamou! Fiz tudo pra vencer! Mas
+alguns não!” - Trecho retirado do filme “Rambo - Programado Para Matar”
+de 1982. O protagonista John Rambo é interpretado por:
+</p>
+<hr>
+</div>
+<div class="w3-container">
+<p>
+13- Escrito, dirigido e interpretado pelos irmãos Wayans, o filme relata
+uma história de dois agentes do FBI que se disfarçam de duas herdeiras
+milionárias e socialites, as irmãs Wilson. Qual é o nome do filme?
+</p>
+<hr>
+</div>
+</body>
+</html>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
