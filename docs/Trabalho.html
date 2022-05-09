@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>TRI Bayesiana</title>
+
+<script src="site_libs/header-attrs-2.13/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">BayesianTRI</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Introdução</a>
+</li>
+<li>
+  <a href="Trabalho.html">Desenvolvimento</a>
+</li>
+<li>
+  <a href="Links.html">Links</a>
+</li>
+<li>
+  <a href="DONOTCLICKHERE.html">Não Assista isso</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">TRI Bayesiana</h1>
+
+</div>
+
+
+<div id="dados" class="section level1">
+<h1>Dados</h1>
+<pre class="r"><code>head(data.f)</code></pre>
+<pre><code>##      i1 i2 i3 i4 i5 i6 i7 i8 i9 i10 i11 i12 i13
+## [1,]  0  0  0  0  0  0  1  0  0   0   0   0   0
+## [2,]  1  1  0  1  1  0  0  1  1   0   1   1   1
+## [3,]  1  0  0  1  1  0  0  1  1   1   1   1   1
+## [4,]  1  1  0  1  1  0  1  1  1   1   1   1   1
+## [5,]  1  1  1  1  1  1  1  1  1   1   1   1   1
+## [6,]  1  1  1  1  1  0  1  1  1   1   1   1   1</code></pre>
+<pre class="r"><code>dim(data.f)</code></pre>
+<pre><code>## [1] 1050   13</code></pre>
+<pre class="r"><code>acertos &lt;- table(rowSums(data.f))
+barplot(acertos)</code></pre>
+<p><img src="Trabalho_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>questoes &lt;- colSums(data.f)
+barplot(questoes)</code></pre>
+<p><img src="Trabalho_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+</div>
+<div id="análise-original" class="section level1">
+<h1>Análise original</h1>
+<p>No modelo é assumido que cada sujeito possui uma habilidade (ponto
+ideal) denotada <span class="math inline">\(\theta_j (K \times
+1)\)</span>, e que cada item possui um parâmetro de dificuldade <span
+class="math inline">\(\alpha_i\)</span> e um parâmetro de discriminacao
+<span class="math inline">\(\beta_i (K \times 1)\)</span>. A escolha
+observada pelo sujeito <span class="math inline">\(j\)</span> no item
+<span class="math inline">\(i\)</span> é a matriz de dados observada que
+é <span class="math inline">\((\mathcal{I} \times j)\)</span>. A escolha
+é ditada por uma utilidade não observada:</p>
+<p><span class="math display">\[z_{i,j} = - \alpha_i +
+\beta_i&#39;\theta_j + \varepsilon_{i,j},\]</span> Onde: <span
+class="math display">\[\varepsilon_{i,j} \sim
+\mathcal{N}(0,1)\]</span></p>
+<div id="mirt" class="section level3">
+<h3>Mirt</h3>
+<pre class="r"><code>mirt.2PL &lt;- mirt(data.f,1,itemtype = &#39;2PL&#39;, TOL = .001)</code></pre>
+<pre><code>## 
+Iteration: 1, Log-Lik: -6785.705, Max-Change: 0.40772
+Iteration: 2, Log-Lik: -6732.446, Max-Change: 0.30774
+Iteration: 3, Log-Lik: -6716.988, Max-Change: 0.21656
+Iteration: 4, Log-Lik: -6711.958, Max-Change: 0.13352
+Iteration: 5, Log-Lik: -6710.551, Max-Change: 0.09204
+Iteration: 6, Log-Lik: -6710.055, Max-Change: 0.05798
+Iteration: 7, Log-Lik: -6709.784, Max-Change: 0.02652
+Iteration: 8, Log-Lik: -6709.746, Max-Change: 0.01802
+Iteration: 9, Log-Lik: -6709.729, Max-Change: 0.01134
+Iteration: 10, Log-Lik: -6709.717, Max-Change: 0.00513
+Iteration: 11, Log-Lik: -6709.715, Max-Change: 0.00318
+Iteration: 12, Log-Lik: -6709.714, Max-Change: 0.00200
+Iteration: 13, Log-Lik: -6709.714, Max-Change: 0.00163
+Iteration: 14, Log-Lik: -6709.714, Max-Change: 0.00065</code></pre>
+<pre class="r"><code>coef.mirt &lt;- data.frame(coef(mirt.2PL,simplify=TRUE,IRTpars=TRUE,na.rm=TRUE)$items)
+
+knitr::kable(coef.mirt[,1:2])</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">a</th>
+<th align="right">b</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">i1</td>
+<td align="right">0.8115923</td>
+<td align="right">-1.2997169</td>
+</tr>
+<tr class="even">
+<td align="left">i2</td>
+<td align="right">0.4587981</td>
+<td align="right">-1.3449373</td>
+</tr>
+<tr class="odd">
+<td align="left">i3</td>
+<td align="right">1.0971852</td>
+<td align="right">-0.0185531</td>
+</tr>
+<tr class="even">
+<td align="left">i4</td>
+<td align="right">1.4766745</td>
+<td align="right">-2.0233890</td>
+</tr>
+<tr class="odd">
+<td align="left">i5</td>
+<td align="right">1.3721472</td>
+<td align="right">-0.6064575</td>
+</tr>
+<tr class="even">
+<td align="left">i6</td>
+<td align="right">0.4566677</td>
+<td align="right">3.4478743</td>
+</tr>
+<tr class="odd">
+<td align="left">i7</td>
+<td align="right">0.3885595</td>
+<td align="right">-3.4823680</td>
+</tr>
+<tr class="even">
+<td align="left">i8</td>
+<td align="right">1.1650512</td>
+<td align="right">-0.7539810</td>
+</tr>
+<tr class="odd">
+<td align="left">i9</td>
+<td align="right">2.1807740</td>
+<td align="right">-1.0935988</td>
+</tr>
+<tr class="even">
+<td align="left">i10</td>
+<td align="right">0.5741907</td>
+<td align="right">-0.7986830</td>
+</tr>
+<tr class="odd">
+<td align="left">i11</td>
+<td align="right">1.1493850</td>
+<td align="right">-1.8233386</td>
+</tr>
+<tr class="even">
+<td align="left">i12</td>
+<td align="right">0.8833726</td>
+<td align="right">-2.2498653</td>
+</tr>
+<tr class="odd">
+<td align="left">i13</td>
+<td align="right">1.4171402</td>
+<td align="right">-2.7664053</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>plot(mirt.2PL, type = &#39;trace&#39;)</code></pre>
+<p><img src="Trabalho_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>coef.mirt %&gt;% 
+  arrange(-a)</code></pre>
+<pre><code>##             a           b g u
+## i9  2.1807740 -1.09359882 0 1
+## i4  1.4766745 -2.02338903 0 1
+## i13 1.4171402 -2.76640529 0 1
+## i5  1.3721472 -0.60645753 0 1
+## i8  1.1650512 -0.75398095 0 1
+## i11 1.1493850 -1.82333858 0 1
+## i3  1.0971852 -0.01855306 0 1
+## i12 0.8833726 -2.24986531 0 1
+## i1  0.8115923 -1.29971694 0 1
+## i10 0.5741907 -0.79868299 0 1
+## i2  0.4587981 -1.34493726 0 1
+## i6  0.4566677  3.44787425 0 1
+## i7  0.3885595 -3.48236801 0 1</code></pre>
+</div>
+</div>
+<div id="análises-bayesianas" class="section level1">
+<h1>Análises Bayesianas</h1>
+<div id="pacote-pscl" class="section level2">
+<h2>Pacote PSCL</h2>
+<p>(Political Science Computational Laboratory)</p>
+<pre class="r"><code>library(pscl)</code></pre>
+<p>Médodo de amostragem utilizado: Amostrador de Gibbs</p>
+<pre class="r"><code>a &lt;- rollcall(data.f)
+ideal &lt;- ideal(a, store.item = T, maxiter = 1e4,
+               normalize = T)</code></pre>
+<pre><code>## ideal: analysis of roll call data via Markov chain Monte Carlo methods.
+## 
+## Ideal Point Estimation
+## 
+## Number of Legislators         1050 
+## Number of Items           13 
+## 
+## 
+## Starting MCMC Iterations...</code></pre>
+<pre class="r"><code>coef.pscl &lt;- as.data.frame(ideal$betabar)
+
+inlogit &lt;- function(alpha, beta, x) 1/(1+exp((-alpha+beta*x)))
+
+x &lt;- seq(-6,6, by = 0.1)
+
+par(mfrow = c(2,4))
+for(i in 1:13){
+  plot(x,
+       inlogit(coef.pscl$Difficulty[i],coef.pscl$`Discrimination D1`[i], x),
+       type = &quot;l&quot;,
+       main = paste(&quot;Item&quot;, i),
+       ylab = &quot;P(theta)&quot;)
+}</code></pre>
+<p><img src="Trabalho_files/figure-html/unnamed-chunk-5-1.png" width="672" /><img src="Trabalho_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+</div>
+<div id="mcmcpack" class="section level2">
+<h2>MCMCpack</h2>
+<pre class="r"><code># Markov Chain Monte Carlo for K-Dimensional Item Response Theory Model
+library(MCMCpack)</code></pre>
+<p>Médodo de amostragem utilizado: Amostrador de Gibbs</p>
+<pre class="r"><code>post1 &lt;- MCMCirtKd(data.f, dimensions = 1,  store.item = T)
+
+sum &lt;- summary(post1) 
+
+coefs.stats &lt;- sum$statistics
+
+(alphas &lt;- coefs.stats[grepl(&quot;alpha&quot;, rownames(coefs.stats)),])</code></pre>
+<pre><code>##                  Mean         SD     Naive SE Time-series SE
+## alpha.i1  -0.63702486 0.04737616 0.0004737616   0.0010913756
+## alpha.i2  -0.38156350 0.04133652 0.0004133652   0.0006885507
+## alpha.i3  -0.01597248 0.04677481 0.0004677481   0.0010389718
+## alpha.i4  -1.66971676 0.10313215 0.0010313215   0.0057715337
+## alpha.i5  -0.49520731 0.05506573 0.0005506573   0.0017029846
+## alpha.i6   0.93951188 0.04786620 0.0004786620   0.0009439264
+## alpha.i7  -0.81946191 0.04546077 0.0004546077   0.0008865656
+## alpha.i8  -0.52680957 0.05290460 0.0005290460   0.0015133327
+## alpha.i9  -1.39306108 0.14115183 0.0014115183   0.0129012703
+## alpha.i10 -0.28336215 0.04208031 0.0004208031   0.0007103736
+## alpha.i11 -1.21435372 0.06971387 0.0006971387   0.0025502002
+## alpha.i12 -1.16162066 0.06143207 0.0006143207   0.0019182309
+## alpha.i13 -2.08873099 0.14118075 0.0014118075   0.0111334067</code></pre>
+<pre class="r"><code>(betas &lt;- coefs.stats[grepl(&quot;beta&quot;, rownames(coefs.stats)),])</code></pre>
+<pre><code>##                 Mean         SD     Naive SE Time-series SE
+## beta.i1.1  0.4898212 0.06343145 0.0006343145    0.002007163
+## beta.i2.1  0.2836661 0.05336224 0.0005336224    0.001385660
+## beta.i3.1  0.6572906 0.06974926 0.0006974926    0.002380316
+## beta.i4.1  0.7975758 0.11125260 0.0011125260    0.006431338
+## beta.i5.1  0.8205272 0.08641106 0.0008641106    0.003859406
+## beta.i6.1  0.2483690 0.06003890 0.0006003890    0.001781734
+## beta.i7.1  0.2234289 0.05727529 0.0005727529    0.001650686
+## beta.i8.1  0.7014098 0.07850868 0.0007850868    0.002881933
+## beta.i9.1  1.2871744 0.18102350 0.0018102350    0.018843377
+## beta.i10.1 0.3544854 0.05605797 0.0005605797    0.001563776
+## beta.i11.1 0.6508311 0.08471744 0.0008471744    0.003691600
+## beta.i12.1 0.4990266 0.07480643 0.0007480643    0.002892884
+## beta.i13.1 0.6899741 0.13126589 0.0013126589    0.010304093</code></pre>
+<pre class="r"><code>coef.mcmc &lt;- data.frame(&quot;Dificuldade&quot; =  alphas[,1], &quot;Discriminacao&quot; = betas[,1])
+
+x &lt;- seq(-6,6, by = 0.1)
+
+inlogit &lt;- function(alpha, beta, x) 1/(1+exp(-(alpha+beta*x)))
+
+par(mfrow = c(2,4))
+for(i in 1:13){
+  plot(x,
+       inlogit(coef.mcmc$Dificuldade[i],coef.mcmc$Discriminacao[i], x),
+       type = &quot;l&quot;,
+       main = paste(&quot;Item&quot;, i),
+       ylab = &quot;P(theta)&quot;)
+}</code></pre>
+<p><img src="Trabalho_files/figure-html/unnamed-chunk-7-1.png" width="672" /><img src="Trabalho_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+</div>
+<div id="jags" class="section level2">
+<h2>JAGS</h2>
+<pre class="r"><code>library(&quot;rjags&quot;)
+
+data.list &lt;- data.f %&gt;% 
+  as.data.frame() %&gt;% 
+  rownames_to_column(var = &quot;id&quot;) %&gt;%
+  pivot_longer(i1:i13,
+               names_to = &quot;item&quot;,
+               values_to = &quot;resp&quot;) %&gt;% 
+  mutate(item = substr(item, 2,3)) %&gt;% 
+  as.list()
+  
+
+data.list$N &lt;- length(data.list$resp)
+data.list$Nid &lt;- length(unique(data.list$id))
+data.list$Nitem &lt;- length(unique(data.list$item))</code></pre>
+<pre class="r"><code>cat(&quot;model{
+    
+    ## cada resposta
+    for(n in 1:N){
+      resp[n] ~ dbern(z[n])
+      logit(z[n]) &lt;- -alpha[item[n]] + beta[item[n]]*theta[id[n]]
+    }
+    
+    
+    ## Para o individuo ind, i = 1, ..., Nid
+    for(ind in 1:Nid){
+      theta[ind] ~ dnorm(0, 1)
+    }
+    
+    ## Para o item it, i = 1, ..., Nitem
+    for(it in 1:Nitem){
+      alpha[it] ~ dnorm(0, 1)
+      beta[it] ~ dnorm(0, 1)
+    }
+}&quot;, file=&quot;sim.jags&quot;)</code></pre>
+<pre class="r"><code>sim.jags &lt;- jags.model(file = &quot;sim.jags&quot;,
+                       data = data.list, n.chains = 3, n.adapt = 1000)
+
+fit.jags &lt;- coda.samples(model=sim.jags,
+                         n.iter=10000, thin=10,
+                         variable.names=c(&quot;alpha&quot;,&quot;beta&quot;, &quot;theta&quot;))</code></pre>
+<pre class="r"><code>sum.jags &lt;- summary(fit.jags)
+
+jags.stats &lt;- sum.jags$statistics
+
+(alphas &lt;- jags.stats[grepl(&quot;alpha&quot;, rownames(jags.stats)),])</code></pre>
+<pre><code>##                   Mean         SD    Naive SE Time-series SE
+## alpha[1]  -1.032421963 0.07817564 0.001427285    0.001427063
+## alpha[2]  -0.606015577 0.06822250 0.001245567    0.001284333
+## alpha[3]   0.001718397 0.07785397 0.001421413    0.001421077
+## alpha[4]  -2.829554912 0.18509029 0.003379271    0.003765354
+## alpha[5]  -0.799876530 0.09379431 0.001712442    0.001793017
+## alpha[6]   1.578653371 0.08717181 0.001591532    0.001457733
+## alpha[7]  -1.343031731 0.07950337 0.001451526    0.001429087
+## alpha[8]  -0.854827653 0.08737702 0.001595279    0.001699825
+## alpha[9]  -2.223795293 0.18460577 0.003370425    0.004342103
+## alpha[10] -0.445215270 0.06878644 0.001255863    0.001278865
+## alpha[11] -2.035224162 0.12409673 0.002265686    0.002369179
+## alpha[12] -1.958409186 0.11381654 0.002077996    0.002145137
+## alpha[13] -3.602745144 0.23035942 0.004205768    0.004563458</code></pre>
+<pre class="r"><code>(betas &lt;- jags.stats[grepl(&quot;beta&quot;, rownames(jags.stats)),])</code></pre>
+<pre><code>##               Mean        SD    Naive SE Time-series SE
+## beta[1]  0.2676517 0.7604371 0.013883619    0.001899392
+## beta[2]  0.1522571 0.4388999 0.008013179    0.001621182
+## beta[3]  0.3725564 1.0558049 0.019276272    0.002520281
+## beta[4]  0.4472126 1.2868240 0.023494085    0.003849202
+## beta[5]  0.4549811 1.2852371 0.023465112    0.002896602
+## beta[6]  0.1535766 0.4384704 0.008005337    0.001951077
+## beta[7]  0.1282503 0.3769478 0.006882094    0.001807953
+## beta[8]  0.3918902 1.1124691 0.020310814    0.002702124
+## beta[9]  0.6711815 1.9231285 0.035111362    0.005616919
+## beta[10] 0.1937619 0.5572639 0.010174200    0.001729991
+## beta[11] 0.3668879 1.0459041 0.019095509    0.002740198
+## beta[12] 0.2888599 0.8373157 0.015287223    0.002507788
+## beta[13] 0.3896813 1.1329092 0.020683998    0.003940572</code></pre>
+<pre class="r"><code>coef.jags &lt;- data.frame(&quot;Dificuldade&quot; =  alphas[,1], &quot;Discriminacao&quot; = betas[,1])
+
+x &lt;- seq(-6,6, by = 0.1)
+inlogit &lt;- function(alpha, beta, x) 1/(1+exp((-alpha+beta*x)))
+
+curvas &lt;- data.frame(x = x)
+
+
+par(mfrow = c(2,4))
+for(i in 1:13){
+  plot(x,
+       inlogit(coef.jags$Dificuldade[i],coef.jags$Discriminacao[i], x),
+       type = &quot;l&quot;,
+       main = paste(&quot;Item&quot;, i),
+       ylab = &quot;P(theta)&quot;)
+}</code></pre>
+<p><img src="Trabalho_files/figure-html/unnamed-chunk-12-1.png" width="672" /><img src="Trabalho_files/figure-html/unnamed-chunk-12-2.png" width="672" /></p>
+</div>
+</div>
+<div id="comparação-entre-os-resultados" class="section level1">
+<h1>Comparação entre os resultados</h1>
+<pre class="r"><code>dificuldade &lt;- data.frame(&quot;item&quot; = paste0(&quot;i&quot;,1:13),
+           &quot;mirt&quot; = order(coef.mirt$b),
+           &quot;pscl&quot; = order(coef.pscl$Difficulty),
+           &quot;mcmc&quot; = order(coef.mcmc$Dificuldade),
+           &quot;jags&quot; = order(coef.jags$Dificuldade))
+
+knitr::kable(dificuldade)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">item</th>
+<th align="right">mirt</th>
+<th align="right">pscl</th>
+<th align="right">mcmc</th>
+<th align="right">jags</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">i1</td>
+<td align="right">7</td>
+<td align="right">13</td>
+<td align="right">13</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">i2</td>
+<td align="right">13</td>
+<td align="right">4</td>
+<td align="right">4</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">i3</td>
+<td align="right">12</td>
+<td align="right">9</td>
+<td align="right">9</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">i4</td>
+<td align="right">4</td>
+<td align="right">11</td>
+<td align="right">11</td>
+<td align="right">11</td>
+</tr>
+<tr class="odd">
+<td align="left">i5</td>
+<td align="right">11</td>
+<td align="right">12</td>
+<td align="right">12</td>
+<td align="right">12</td>
+</tr>
+<tr class="even">
+<td align="left">i6</td>
+<td align="right">2</td>
+<td align="right">7</td>
+<td align="right">7</td>
+<td align="right">7</td>
+</tr>
+<tr class="odd">
+<td align="left">i7</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">i8</td>
+<td align="right">9</td>
+<td align="right">8</td>
+<td align="right">8</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">i9</td>
+<td align="right">10</td>
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">i10</td>
+<td align="right">8</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">i11</td>
+<td align="right">5</td>
+<td align="right">10</td>
+<td align="right">10</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">i12</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">i13</td>
+<td align="right">6</td>
+<td align="right">6</td>
+<td align="right">6</td>
+<td align="right">6</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>discriminacao &lt;- data.frame(&quot;item&quot; = paste0(&quot;i&quot;,1:13),
+           &quot;mirt&quot; = order(coef.mirt$a),
+           &quot;pscl&quot; = order(-coef.pscl$`Discrimination D1`),
+           &quot;mcmc&quot; = order(coef.mcmc$Discriminacao),
+           &quot;jags&quot; = order(-coef.jags$Discriminacao))
+
+knitr::kable(discriminacao)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">item</th>
+<th align="right">mirt</th>
+<th align="right">pscl</th>
+<th align="right">mcmc</th>
+<th align="right">jags</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">i1</td>
+<td align="right">7</td>
+<td align="right">7</td>
+<td align="right">7</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">i2</td>
+<td align="right">6</td>
+<td align="right">6</td>
+<td align="right">6</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">i3</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">i4</td>
+<td align="right">10</td>
+<td align="right">10</td>
+<td align="right">10</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">i5</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">i6</td>
+<td align="right">12</td>
+<td align="right">12</td>
+<td align="right">12</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">i7</td>
+<td align="right">3</td>
+<td align="right">11</td>
+<td align="right">11</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">i8</td>
+<td align="right">11</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">i9</td>
+<td align="right">8</td>
+<td align="right">8</td>
+<td align="right">13</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">i10</td>
+<td align="right">5</td>
+<td align="right">13</td>
+<td align="right">8</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">i11</td>
+<td align="right">13</td>
+<td align="right">5</td>
+<td align="right">4</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="left">i12</td>
+<td align="right">4</td>
+<td align="right">4</td>
+<td align="right">5</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">i13</td>
+<td align="right">9</td>
+<td align="right">9</td>
+<td align="right">9</td>
+<td align="right">7</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
