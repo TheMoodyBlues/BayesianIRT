@@ -6,7 +6,7 @@ output:
     toc_float: true
     collapsed: false
     number_sections: false
-    toc_depth: 1
+    toc_depth: 3
     #code_folding: hide
 ---
 
@@ -56,7 +56,7 @@ No modelo é assumido que cada sujeito possui uma habilidade (ponto ideal) denot
 
 $$z_{i,j} = - \alpha_i + \beta_i'\theta_j + \varepsilon_{i,j},$$ Onde: $$\varepsilon_{i,j} \sim \mathcal{N}(0,1)$$
 
-### Mirt
+## Mirt
 
 ```{r}
 mirt.2PL <- mirt(data.f,1,itemtype = '2PL', TOL = .001)
