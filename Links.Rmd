@@ -6,7 +6,7 @@ output: html_document
 
 ### Referências
 
-1. [mirt: Multidimensional Item Response Theory](https://cran.r-project.org/web/packages/mirt/index.html), usado para nálise de dados de resposta dicotômica e politômica usando modelos de traços latentes unidimensionais e multidimensionais sob o paradigma da Teoria de Resposta ao Item.
-2. [Stan](https://mc-stan.org/), uma plataforma de última geração para modelagem estatística e computação estatística de alto desempenho.
-3. [pscl: Political Science Computational Laboratory]()
-4. [JAGS - Two Latent Variable](https://noah-padgett.github.io/Bayesian-Psychometric-Modeling/jags-two-latent-variable.html), como fazer a análise para dois parâmetros logísticos utilizando o JAGS.
+1. [mirt: Multidimensional Item Response Theory](https://cran.r-project.org/web/packages/mirt/index.html)
+2. [pscl: Political Science Computational Laboratory](https://cran.r-project.org/web/packages/pscl/index.html)
+3. [JAGS - Two Latent Variable](https://noah-padgett.github.io/Bayesian-Psychometric-Modeling/jags-two-latent-variable.html)
+4. [MCMCirtKd: Markov Chain Monte Carlo for K-Dimensional Item Response Theory Model](https://www.rdocumentation.org/packages/MCMCpack/versions/1.3-6/topics/MCMCirtKd)
