@@ -3,6 +3,7 @@ title: "Bayesian IRT"
 output: html_document
 ---
 
+```{=html}
 <style type="text/css">
 .title {
   display: none
@@ -17,88 +18,101 @@ output: html_document
 }
 
 </style>
+```
+::: {.row style="padding-top: 30px
 
-<div class="row" style="padding-top: 30px
-
-">
-
-
+"}
 # **Teoria de Resposta ao Item: explorando abordagens bayesianas**
 
-
-<div class="col-sm-8">
-
-
-A teoria de resposta ao item (TRI), também conhecida como teoria do traço latente, é utilizada para o design, análise e pontuação de testes, questionários e instrumentos semelhantes que medem habilidades, atitudes ou outras variáveis. 
+::: col-sm-8
+A teoria de resposta ao item (TRI), também conhecida como teoria do traço latente, é utilizada para o design, análise e pontuação de testes, questionários e instrumentos semelhantes que medem habilidades, atitudes ou outras variáveis.
 
 É uma metodologia que se baseia na relação entre o desempenho dos indivíduos em um item de teste e os níveis de desempenho dos participantes do teste em uma medida geral, considerando a habilidade que o item foi projetado para medir. Vários modelos estatísticos diferentes são usados para representar as características do item e do participante do teste. Ao contrário de alternativas mais simples, não pressupõe que cada item seja igualmente difícil.
-
 
 ## Objetivo
 
 Vamos utilizar diferentes modelos bayesianos para replicar uma análise originalmente feita com o pacote [mirt](https://cran.r-project.org/web/packages/mirt/index.html). Os dados utilizados são de um questionário de conhecimento geral sobre filmes, com mais de 900 respostas, desenvolvido em conjunto pela turma na matéria de teoria de resposta ao item.
+:::
 
-
-</div>
-<div class="col-sm-4">
-
-
-
+::: col-sm-4
 ![](images/cinema-icon.jpg)
+:::
 
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<body>
+
+<div class="w3-container"> 
+  <h2>Itens do Questionário</h2>
+  <p>1- Em Toy Story 3, “Andy tem 17 anos e está prestes a ir para a faculdade. Desta forma, precisa arrumar o quarto e definir o que irá para o lixo e o que será guardado no sótão. Seus antigos brinquedos, entre eles Buzz Lightyear, Jessie e o Sr. Cabeça de Batata, são separados para serem guardados no sótão. Entretanto,uma confusão faz com que a mãe de Andy os coloque no lixo. Woody, que será levado por Andy para a faculdade, decide salvá-los.” Qual destino o Andy define para os brinquedos no final do filme?</p>
+  <hr>
+</div>
+
+<article class="w3-container"> 
+  <p>2- Corra que a Polícia Vem Aí! é um filme estadunidense de 1988, do gênero comédia, dirigido por David Zucker e estrelado por Leslie Nielsen. Trata-se de uma comédia no estilo pastelão, com diversas piadas de cena e trocadilhos de duplo sentido. O filme é baseado em uma série de TV estrelada pelo próprio Nielsen. Qual é o nome dessa série?</p>
+  <hr>
+</article>
+
+<section class="w3-container"> 
+  <p>3- Um dos principais diretores do gênero de Ficção Científica nasceu no Reino Unido e foi descrito pelo produtor Michael Deeley como “Melhor olho no ramo”. Dentre os títulos dirigidos estão Alien, Blade Runner e Perdido em Marte. Qual é o nome do diretor?</p>
+  <hr>
+</section>
+
+<div class="w3-container"> 
+  <p>4- No mundo pós-apocalíptico de “Bird Box”, Malorie tenta fugir com seus filhos para um local onde possam viver em segurança, mas para chegar até o refúgio eles não podem utilizar um de seus sentidos. De qual sentido a família abdica durante a viagem?</p>
+  <hr>
+</div>
+
+<div class="w3-container"> 
+  <p>5- Em Vingadores Guerra Infinita (2018), o personagem Thanos,está em busca das seis joias do infinito. Aquele que tiver a posse de todas as joias e a manopla, uma espécie de peça protetora das mãos, pode enfim realizar qualquer desejo. Qual é o objetivo de Thanos ao adquirir todos as joias do infinito?</p>
+  <hr>
+</div>
+
+<div class="w3-container"> 
+  <p>6- Winter on Fire: A Luta pela Liberdade da Ucrânia” é um documentário de 2015 sobre os protestos que explodiram no país, de 2013 a 2014. Qual o nome do movimento de liberdade retratado no documentário?</p>
+  <hr>
+</div>
+
+<div class="w3-container"> 
+  <p>7- O filme ""Viagem à Lua"" (1902), foi inspirado nos livros ""De la Terre à la Lune"", de Julio Verne, e ""The First Men in the Moon"", de H. G. Wells. Narra a história de um grupo de cinco astrônomos que viajam à Lua numa cápsula lançada por um canhão gigante, onde são capturados pelos selenitas. Qual é o gênero do filme ""Viagem à lua""?
+</p>
+  <hr>
+</div>
+
+<div class="w3-container"> 
+  <p>8- Qual filme retratou o enfrentamento inglês contra a inteligência alemã, resolvendo a criptografia da máquina “Enigma”?</p>
+  <hr>
+</div>
+
+<div class="w3-container"> 
+  <p>9- O inverno rigoroso é pano de fundo para diversos acontecimentos dessa série, com a famosa frase dita em todas as oito temporadas por diversos personagens: “winter is coming” (o inverno está chegando). Qual é o nome dessa série?</p>
+  <hr>
+</div>
+
+<div class="w3-container"> 
+  <p>10- No começo do filme “Vingadores: Ultimato”, o grande vilão Thanos é morto por um dos heróis da trama. Quem é este herói?</p>
+  <hr>
+</div>
+
+<div class="w3-container"> 
+  <p>11- Em Hanna Montana: O Filme, Miley Stewart é uma adolescente que convive com seus amigos, família e frequenta a escola, entretanto ela guarda um segredo que a força tomar algumas decisões. Qual é o segredo de Miley Stewart?</p>
+  <hr>
+</div>
+
+<div class="w3-container"> 
+  <p>12- "A guerra não era minha. Você me chamou! Fiz tudo pra vencer! Mas alguns não!" - Trecho retirado do filme "Rambo - Programado Para Matar" de 1982. O protagonista John Rambo é interpretado por:
+</p>
+  <hr>
+</div>
+
+<div class="w3-container"> 
+  <p>13- Escrito, dirigido e interpretado pelos irmãos Wayans, o filme relata uma história de dois agentes do FBI que se disfarçam de duas herdeiras milionárias e socialites, as irmãs Wilson. Qual é o nome do filme?</p>
+  <hr>
 </div>
 
 
-<div class="container">
-  <div class="row">
-    <div class=""col-12 col-md-12"">1- Em Toy Story 3, “Andy tem 17 anos e está prestes a ir para a faculdade. Desta forma, precisa arrumar o quarto e definir o que irá para o lixo e o que será guardado no sótão. Seus antigos brinquedos, entre eles Buzz Lightyear, Jessie e o Sr. Cabeça de Batata, são separados para serem guardados no sótão. Entretanto,uma confusão faz com que a mãe de Andy os coloque no lixo. Woody, que será levado por Andy para a faculdade, decide salvá-los.” Qual destino o Andy define para os brinquedos no final do filme?</div>
-    <div class="w-100"></div>
-    <div class=""col-12 col-md-12"">
-2- Corra que a Polícia Vem Aí! é um filme estadunidense de 1988, do gênero comédia, dirigido por David Zucker e estrelado por Leslie Nielsen. Trata-se de uma comédia no estilo pastelão, com diversas piadas de cena e trocadilhos de duplo sentido. O filme é baseado em uma série de TV estrelada pelo próprio Nielsen. Qual é o nome dessa série?
-</div>
-    <div class="w-100"></div>
-    <div class=""col-12 col-md-12"">3- Um dos principais diretores do gênero de Ficção Científica nasceu no Reino Unido e foi descrito pelo produtor Michael Deeley como “Melhor olho no ramo”. Dentre os títulos dirigidos estão Alien, Blade Runner e Perdido em Marte. Qual é o nome do diretor?</div>
-    <div class="w-100"></div>
-    <div class=""col-12 col-md-12"">4- No mundo pós-apocalíptico de “Bird Box”, Malorie tenta fugir com seus filhos para um local onde possam viver em segurança, mas para chegar até o refúgio eles não podem utilizar um de seus sentidos. De qual sentido a família abdica durante a viagem?
-</div>
-    <div class="w-100"></div>
-    <div class=""col-12 col-md-12"">5- Em Vingadores Guerra Infinita (2018), o personagem Thanos,está em busca das seis joias do infinito. Aquele que tiver a posse de todas as joias e a manopla, uma espécie de peça protetora das mãos, pode enfim realizar qualquer desejo. Qual é o objetivo de Thanos ao adquirir todos as joias do infinito?</div>
-    <div class="w-100"></div>
-    <div class=""col-12 col-md-12"">6- Winter on Fire: A Luta pela Liberdade da Ucrânia” é um documentário de 2015 sobre os protestos que explodiram no país, de 2013 a 2014. Qual o nome do movimento de liberdade retratado no documentário?</div>
-    <div class="w-100"></div>
-    <div class=""col-12 col-md-12"">
-7- O filme ""Viagem à Lua"" (1902), foi inspirado nos livros ""De la Terre à la Lune"", de Julio Verne, e ""The First Men in the Moon"", de H. G. Wells. Narra a história de um grupo de cinco astrônomos que viajam à Lua numa cápsula lançada por um canhão gigante, onde são capturados pelos selenitas. Qual é o gênero do filme ""Viagem à lua""?</div>
-    <div class="w-100"></div>
-    <div class="col">8- Qual filme retratou o enfrentamento inglês contra a inteligência alemã, resolvendo a criptografia da máquina “Enigma”?
-</div>
-    <div class="w-100"></div>
-    <div class=""col-12 col-md-12"">9- O inverno rigoroso é pano de fundo para diversos acontecimentos dessa série, com a famosa frase dita em todas as oito temporadas por diversos personagens: “winter is coming” (o inverno está chegando). Qual é o nome dessa série?
-</div>
-     <div class="w-100"></div>
-    <div class=""col-12 col-md-12"">10- No começo do filme “Vingadores: Ultimato”, o grande vilão Thanos é morto por um dos heróis da trama. Quem é este herói?
-</div>
-     <div class="w-100"></div>
-    <div class=""col-12 col-md-12"">11- Em Hanna Montana: O Filme, Miley Stewart é uma adolescente que convive com seus amigos, família e frequenta a escola, entretanto ela guarda um segredo que a força tomar algumas decisões. Qual é o segredo de Miley Stewart?
-</div>
-     <div class="w-100"></div>
-    <div class=""col-12 col-md-12""> 
-12- “A guerra não era minha. Você me chamou! Fiz tudo pra vencer! Mas alguns não!” - Trecho retirado do filme “Rambo - Programado Para Matar” de 1982. O protagonista John Rambo é interpretado por:</div>
-     <div class="w-100"></div>
-    <div class=""col-12 col-md-12"">
-13- Escrito, dirigido e interpretado pelos irmãos Wayans, o filme relata uma história de dois agentes do FBI que se disfarçam de duas herdeiras milionárias e socialites, as irmãs Wilson. Qual é o nome do filme?
-</div>
-    
-    
-    
-  </div>
-</div>
 
-
-
-
-
-
-
-
-
-
+</body>
+</html> 
