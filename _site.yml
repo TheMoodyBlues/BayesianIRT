@@ -1,0 +1,13 @@
+name: "BayesianTRI"
+navbar:
+  title: "BayesianTRI"
+  left:
+    - text: "Introdução"
+      href: index.html
+    - text: "Desenvolvimento"
+      href: Trabalho.html
+    - text: "Links"
+      href: Links.html
+    - text: "Não Assista isso"
+      href: DONOTCLICKHERE.html
+output_dir: "docs"

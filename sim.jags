@@ -1,0 +1,20 @@
+model{
+    
+    ## cada resposta
+    for(n in 1:N){
+      resp[n] ~ dbern(z[n])
+      logit(z[n]) <- -alpha[item[n]] + beta[item[n]]*theta[id[n]]
+    }
+    
+    
+    ## Para o individuo ind, i = 1, ..., Nid
+    for(ind in 1:Nid){
+      theta[ind] ~ dnorm(0, 1)
+    }
+    
+    ## Para o item it, i = 1, ..., Nitem
+    for(it in 1:Nitem){
+      alpha[it] ~ dnorm(0, 1)
+      beta[it] ~ dnorm(0, 1)
+    }
+}

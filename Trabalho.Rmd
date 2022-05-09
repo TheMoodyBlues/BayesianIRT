@@ -1,0 +1,253 @@
+---
+title: "TRI Bayesiana"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    collapsed: false
+    number_sections: false
+    toc_depth: 1
+    #code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE,cache=TRUE,message=FALSE)
+
+library(tidyverse)
+library(ltm)
+library(mirt)
+library(irtoys)
+```
+
+# Dados
+
+```{r, include = F}
+#Respostas
+data <- read_csv2("respostas.csv")
+perguntas <- colnames(data)
+colnames(data) <- c(paste0("i",1:13), paste0("f",1:3))
+
+#Gabarito
+gab <- read_csv2("gabarito.csv", col_names = FALSE)
+colnames(gab) <- c(paste0("i",1:13))
+
+#Desconsidera as linhas incompletas
+data.NA <- data[complete.cases(data), ]
+
+#Correção
+data.f <- mult.choice(data.NA[,1:13],as.numeric(gab))
+```
+
+```{r}
+head(data.f)
+dim(data.f)
+
+acertos <- table(rowSums(data.f))
+barplot(acertos)
+
+questoes <- colSums(data.f)
+barplot(questoes)
+```
+
+# Análise original
+
+
+No modelo é assumido que cada sujeito possui uma habilidade (ponto ideal) denotada $\theta_j (K \times 1)$, e que cada item possui um parâmetro de dificuldade $\alpha_i$ e um parâmetro de discriminacao $\beta_i (K \times 1)$. A escolha observada pelo sujeito $j$ no item $i$ é a matriz de dados observada que é $(\mathcal{I} \times j)$. A escolha é ditada por uma utilidade não observada:
+
+$$z_{i,j} = - \alpha_i + \beta_i'\theta_j + \varepsilon_{i,j},$$ Onde: $$\varepsilon_{i,j} \sim \mathcal{N}(0,1)$$
+
+### Mirt
+
+```{r}
+mirt.2PL <- mirt(data.f,1,itemtype = '2PL', TOL = .001)
+coef.mirt <- data.frame(coef(mirt.2PL,simplify=TRUE,IRTpars=TRUE,na.rm=TRUE)$items)
+
+knitr::kable(coef.mirt[,1:2])
+plot(mirt.2PL, type = 'trace')
+
+coef.mirt %>% 
+  arrange(-a)
+```
+
+# Análises Bayesianas
+
+## Pacote PSCL
+
+(Political Science Computational Laboratory)
+
+```{r}
+library(pscl)
+```
+
+Médodo de amostragem utilizado: Amostrador de Gibbs
+
+```{r}
+a <- rollcall(data.f)
+ideal <- ideal(a, store.item = T, maxiter = 1e4,
+               normalize = T)
+
+coef.pscl <- as.data.frame(ideal$betabar)
+
+inlogit <- function(alpha, beta, x) 1/(1+exp((-alpha+beta*x)))
+
+x <- seq(-6,6, by = 0.1)
+
+par(mfrow = c(2,4))
+for(i in 1:13){
+  plot(x,
+       inlogit(coef.pscl$Difficulty[i],coef.pscl$`Discrimination D1`[i], x),
+       type = "l",
+       main = paste("Item", i),
+       ylab = "P(theta)")
+}
+
+```
+
+## MCMCpack
+
+```{r}
+# Markov Chain Monte Carlo for K-Dimensional Item Response Theory Model
+library(MCMCpack)
+```
+
+Médodo de amostragem utilizado: Amostrador de Gibbs
+
+
+```{r}
+post1 <- MCMCirtKd(data.f, dimensions = 1,  store.item = T)
+
+sum <- summary(post1) 
+
+coefs.stats <- sum$statistics
+
+(alphas <- coefs.stats[grepl("alpha", rownames(coefs.stats)),])
+(betas <- coefs.stats[grepl("beta", rownames(coefs.stats)),])
+
+coef.mcmc <- data.frame("Dificuldade" =  alphas[,1], "Discriminacao" = betas[,1])
+
+x <- seq(-6,6, by = 0.1)
+
+inlogit <- function(alpha, beta, x) 1/(1+exp(-(alpha+beta*x)))
+
+par(mfrow = c(2,4))
+for(i in 1:13){
+  plot(x,
+       inlogit(coef.mcmc$Dificuldade[i],coef.mcmc$Discriminacao[i], x),
+       type = "l",
+       main = paste("Item", i),
+       ylab = "P(theta)")
+}
+```
+
+
+## JAGS
+
+```{r}
+library("rjags")
+
+data.list <- data.f %>% 
+  as.data.frame() %>% 
+  rownames_to_column(var = "id") %>%
+  pivot_longer(i1:i13,
+               names_to = "item",
+               values_to = "resp") %>% 
+  mutate(item = substr(item, 2,3)) %>% 
+  as.list()
+  
+
+data.list$N <- length(data.list$resp)
+data.list$Nid <- length(unique(data.list$id))
+data.list$Nitem <- length(unique(data.list$item))
+```
+
+
+```{r, eval=FALSE}
+cat("model{
+    
+    ## cada resposta
+    for(n in 1:N){
+      resp[n] ~ dbern(z[n])
+      logit(z[n]) <- -alpha[item[n]] + beta[item[n]]*theta[id[n]]
+    }
+    
+    
+    ## Para o individuo ind, i = 1, ..., Nid
+    for(ind in 1:Nid){
+      theta[ind] ~ dnorm(0, 1)
+    }
+    
+    ## Para o item it, i = 1, ..., Nitem
+    for(it in 1:Nitem){
+      alpha[it] ~ dnorm(0, 1)
+      beta[it] ~ dnorm(0, 1)
+    }
+}", file="sim.jags")
+```
+
+
+```{r, eval=FALSE}
+sim.jags <- jags.model(file = "sim.jags",
+                       data = data.list, n.chains = 3, n.adapt = 1000)
+
+fit.jags <- coda.samples(model=sim.jags,
+                         n.iter=10000, thin=10,
+                         variable.names=c("alpha","beta", "theta"))
+
+```
+
+
+```{r, echo=FALSE}
+load("C:/Users/marin/BayesianIRT/fit-jags.Rdata")
+```
+
+
+```{r}
+sum.jags <- summary(fit.jags)
+
+jags.stats <- sum.jags$statistics
+
+(alphas <- jags.stats[grepl("alpha", rownames(jags.stats)),])
+(betas <- jags.stats[grepl("beta", rownames(jags.stats)),])
+coef.jags <- data.frame("Dificuldade" =  alphas[,1], "Discriminacao" = betas[,1])
+
+x <- seq(-6,6, by = 0.1)
+inlogit <- function(alpha, beta, x) 1/(1+exp((-alpha+beta*x)))
+
+curvas <- data.frame(x = x)
+
+
+par(mfrow = c(2,4))
+for(i in 1:13){
+  plot(x,
+       inlogit(coef.jags$Dificuldade[i],coef.jags$Discriminacao[i], x),
+       type = "l",
+       main = paste("Item", i),
+       ylab = "P(theta)")
+}
+
+```
+
+# Comparação entre os resultados
+
+```{r}
+
+dificuldade <- data.frame("item" = paste0("i",1:13),
+           "mirt" = order(coef.mirt$b),
+           "pscl" = order(coef.pscl$Difficulty),
+           "mcmc" = order(coef.mcmc$Dificuldade),
+           "jags" = order(coef.jags$Dificuldade))
+
+knitr::kable(dificuldade)
+
+discriminacao <- data.frame("item" = paste0("i",1:13),
+           "mirt" = order(coef.mirt$a),
+           "pscl" = order(-coef.pscl$`Discrimination D1`),
+           "mcmc" = order(coef.mcmc$Discriminacao),
+           "jags" = order(-coef.jags$Discriminacao))
+
+knitr::kable(discriminacao)
+```
+
+
+
+
