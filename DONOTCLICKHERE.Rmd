@@ -1,0 +1,31 @@
+---
+title: "NÂO CLIQUE"
+output: html_document
+---
+
+```{=html}
+<style type="text/css">
+.title {
+  display: none
+  
+  
+}
+
+#getting-started img {
+  margin-right: 10px
+  
+  
+}
+
+</style>
+```
+
+<div class="row" style="padding-top: 30px;">
+
+
+# **Ah, o Stan...**
+
+<iframe src="https://drive.google.com/file/d/1TmDkeQXNf0f28FApnyHInN6HrhCDcPRO/preview" width=854 height=480
+allow="autoplay"></iframe>
+
+</div>
