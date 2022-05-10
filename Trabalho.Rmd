@@ -64,9 +64,6 @@ coef.mirt <- data.frame(coef(mirt.2PL,simplify=TRUE,IRTpars=TRUE,na.rm=TRUE)$ite
 
 knitr::kable(coef.mirt[,1:2])
 plot(mirt.2PL, type = 'trace')
-
-coef.mirt %>% 
-  arrange(-a)
 ```
 
 # Análises Bayesianas
@@ -120,8 +117,12 @@ sum <- summary(post1)
 
 coefs.stats <- sum$statistics
 
-(alphas <- coefs.stats[grepl("alpha", rownames(coefs.stats)),])
-(betas <- coefs.stats[grepl("beta", rownames(coefs.stats)),])
+alphas <- coefs.stats[grepl("alpha", rownames(coefs.stats)),]
+round(alphas,4)
+
+betas <- coefs.stats[grepl("beta", rownames(coefs.stats)),]
+round(betass,4)
+
 
 coef.mcmc <- data.frame("Dificuldade" =  alphas[,1], "Discriminacao" = betas[,1])
 
@@ -206,15 +207,16 @@ sum.jags <- summary(fit.jags)
 
 jags.stats <- sum.jags$statistics
 
-(alphas <- jags.stats[grepl("alpha", rownames(jags.stats)),])
-(betas <- jags.stats[grepl("beta", rownames(jags.stats)),])
+alphas <- jags.stats[grepl("alpha", rownames(jags.stats)),]
+round(alphas,4)
+
+betas <- jags.stats[grepl("beta", rownames(jags.stats)),]
+round(betas,4)
+
 coef.jags <- data.frame("Dificuldade" =  alphas[,1], "Discriminacao" = betas[,1])
 
 x <- seq(-6,6, by = 0.1)
-inlogit <- function(alpha, beta, x) 1/(1+exp((-alpha+beta*x)))
-
-curvas <- data.frame(x = x)
-
+inlogit <- function(alpha, beta, x) 1/(1+exp(-(alpha+beta*x)))
 
 par(mfrow = c(2,4))
 for(i in 1:13){
