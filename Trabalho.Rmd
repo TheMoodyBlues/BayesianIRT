@@ -121,7 +121,7 @@ alphas <- coefs.stats[grepl("alpha", rownames(coefs.stats)),]
 round(alphas,4)
 
 betas <- coefs.stats[grepl("beta", rownames(coefs.stats)),]
-round(betass,4)
+round(betas,4)
 
 
 coef.mcmc <- data.frame("Dificuldade" =  alphas[,1], "Discriminacao" = betas[,1])
