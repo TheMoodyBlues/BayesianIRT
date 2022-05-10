@@ -197,7 +197,7 @@ fit.jags <- coda.samples(model=sim.jags,
 
 
 ```{r, echo=FALSE}
-load("C:/Users/marin/BayesianIRT/fit-jags.Rdata")
+load("fit-jags.Rdata")
 ```
 
 
