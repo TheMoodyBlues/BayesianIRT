@@ -56,7 +56,9 @@ No modelo é assumido que cada sujeito possui uma habilidade (ponto ideal) denot
 
 $$z_{i,j} = - \alpha_i + \beta_i'\theta_j + \varepsilon_{i,j},$$ Onde: $$\varepsilon_{i,j} \sim \mathcal{N}(0,1)$$
 
-## Mirt
+## Pacote Mirt
+
+O pacote mirt utiliza a verossimilhança para estimar os parâmetros, porém devido à complexidade do modelo os valores são estimados através do algoritmo de Metropolis-Hastings.
 
 ```{r}
 mirt.2PL <- mirt(data.f,1,itemtype = '2PL', TOL = .001)
@@ -68,6 +70,11 @@ plot(mirt.2PL, type = 'trace')
 
 # Análises Bayesianas
 
+Abaixo apresentamos diversas maneiras diferentes de simular amostras posterioris para os parâmetros de dificuldade e discriminação, em todos os métodos foram feitas 10000 simulações.
+
+Cada um dos pacotes apresentados utiliza parametrizações e nomenclaturas distintas, sendo necessárias pequenas mudanças no código de cada seção.
+
+
 ## Pacote PSCL
 
 (Political Science Computational Laboratory)
@@ -78,6 +85,8 @@ library(pscl)
 
 Médodo de amostragem utilizado: Amostrador de Gibbs
 
+Prioris padrão: N(0,1) para as habilidades e N(0,0.04) para dificuldade e discriminação
+
 ```{r}
 a <- rollcall(data.f)
 ideal <- ideal(a, store.item = T, maxiter = 1e4,
@@ -85,17 +94,18 @@ ideal <- ideal(a, store.item = T, maxiter = 1e4,
 
 coef.pscl <- as.data.frame(ideal$betabar)
 
-inlogit <- function(alpha, beta, x) 1/(1+exp((-alpha+beta*x)))
+in.2pl <- function(alpha, beta, x) exp(-alpha*(x - beta))/(1 + exp(-alpha*(x- beta)))
 
 x <- seq(-6,6, by = 0.1)
 
 par(mfrow = c(2,4))
 for(i in 1:13){
   plot(x,
-       inlogit(coef.pscl$Difficulty[i],coef.pscl$`Discrimination D1`[i], x),
+       in.2pl(coef.pscl$`Discrimination D1`[i],coef.pscl$Difficulty[i], x),
        type = "l",
        main = paste("Item", i),
-       ylab = "P(theta)")
+       ylab = "P(theta)",
+       ylim = c(0,1))
 }
 
 ```
@@ -123,20 +133,20 @@ round(alphas,4)
 betas <- coefs.stats[grepl("beta", rownames(coefs.stats)),]
 round(betas,4)
 
-
-coef.mcmc <- data.frame("Dificuldade" =  alphas[,1], "Discriminacao" = betas[,1])
+coef.mcmc <- data.frame("Dificuldade" = alphas[,1], "Discriminacao" = betas[,1])
 
 x <- seq(-6,6, by = 0.1)
 
-inlogit <- function(alpha, beta, x) 1/(1+exp(-(alpha+beta*x)))
+in.2pl <- function(alpha, beta, x) exp(alpha*(x - beta))/(1 + exp(alpha*(x- beta)))
 
 par(mfrow = c(2,4))
 for(i in 1:13){
   plot(x,
-       inlogit(coef.mcmc$Dificuldade[i],coef.mcmc$Discriminacao[i], x),
+       in.2pl(coef.mcmc$Discriminacao[i],coef.mcmc$Dificuldade[i], x),
        type = "l",
        main = paste("Item", i),
-       ylab = "P(theta)")
+       ylab = "P(theta)",
+       ylim = c(0,1))
 }
 ```
 
@@ -216,18 +226,34 @@ round(betas,4)
 coef.jags <- data.frame("Dificuldade" =  alphas[,1], "Discriminacao" = betas[,1])
 
 x <- seq(-6,6, by = 0.1)
-inlogit <- function(alpha, beta, x) 1/(1+exp(-(alpha+beta*x)))
+in.2pl <- function(beta, alpha, x) exp(beta*(x - alpha))/(1 + exp(beta*(x- alpha)))
 
 par(mfrow = c(2,4))
 for(i in 1:13){
   plot(x,
-       inlogit(coef.jags$Dificuldade[i],coef.jags$Discriminacao[i], x),
+       in.2pl(coef.jags$Discriminacao[i],coef.jags$Dificuldade[i], x),
        type = "l",
        main = paste("Item", i),
        ylab = "P(theta)")
 }
 
 ```
+
+### Convergência
+
+Como os resultados utilizando o modelo do jags não foi muito satisfatório abaixo apresentamos os traços das cadeias para ambos os parâmetros dos dois primeiros itens:
+
+```{r}
+bayesplot::mcmc_trace(fit.jags, pars = c("alpha[1]","beta[1]","alpha[2]","beta[2]"))
+```
+
+Vemos que as cadeias dos parâmetros de dificuldade convergiram, porém os parâmetros de discriminação não apresentam cadeias identicas em todos os casos, vale notar que as cadeias dos betas são a mesma porém com o sinal invertido, abaixo vemos que alguns dos thetas também apresentam esse comportamento, o que faz sentido com a parametrização do modelo pois são os termos que são multiplicados. 
+
+```{r}
+bayesplot::mcmc_trace(fit.jags, pars = c("theta[1]","theta[2]","theta[3]","theta[4]"))
+```
+
+Esse comportamento é, em parte, devido às prioris selecionadas, para um resultado mais satisfatório seria necessário utilizar outras distribuições que assumissem apenas valores positivos ou restringir os valores de beta.
 
 # Comparação entre os resultados
 
@@ -245,7 +271,7 @@ discriminacao <- data.frame("item" = paste0("i",1:13),
            "mirt" = order(coef.mirt$a),
            "pscl" = order(-coef.pscl$`Discrimination D1`),
            "mcmc" = order(coef.mcmc$Discriminacao),
-           "jags" = order(-coef.jags$Discriminacao))
+           "jags" = order(coef.jags$Discriminacao))
 
 knitr::kable(discriminacao)
 ```
