@@ -150,7 +150,6 @@ for(i in 1:13){
 }
 ```
 
-
 ## JAGS
 
 ```{r}
@@ -170,7 +169,7 @@ data.list$N <- length(data.list$resp)
 data.list$Nid <- length(unique(data.list$id))
 data.list$Nitem <- length(unique(data.list$item))
 ```
-
+Abaixo definimos o modelo, para melhor convergência e devido à natureza do modelo, utilizamos uma priori beta para o parâmetro beta, assim evitamos valores negativos de discriminação e a interação entre os parâmteros beta e theta fica menos turbulenta.
 
 ```{r, eval=FALSE}
 cat("model{
@@ -190,7 +189,7 @@ cat("model{
     ## Para o item it, i = 1, ..., Nitem
     for(it in 1:Nitem){
       alpha[it] ~ dnorm(0, 1)
-      beta[it] ~ dnorm(0, 1)
+      beta[it] ~ dbeta(1, 1)
     }
 }", file="sim.jags")
 ```
@@ -234,26 +233,27 @@ for(i in 1:13){
        in.2pl(coef.jags$Discriminacao[i],coef.jags$Dificuldade[i], x),
        type = "l",
        main = paste("Item", i),
-       ylab = "P(theta)")
+       ylab = "P(theta)",
+       ylim = c(0,1))
 }
 
 ```
 
 ### Convergência
 
-Como os resultados utilizando o modelo do jags não foi muito satisfatório abaixo apresentamos os traços das cadeias para ambos os parâmetros dos dois primeiros itens:
+Abaixo apresentamos os traços das cadeias para ambos os parâmetros dos dois primeiros itens:
 
 ```{r}
 bayesplot::mcmc_trace(fit.jags, pars = c("alpha[1]","beta[1]","alpha[2]","beta[2]"))
 ```
 
-Vemos que as cadeias dos parâmetros de dificuldade convergiram, porém os parâmetros de discriminação não apresentam cadeias identicas em todos os casos, vale notar que as cadeias dos betas são a mesma porém com o sinal invertido, abaixo vemos que alguns dos thetas também apresentam esse comportamento, o que faz sentido com a parametrização do modelo pois são os termos que são multiplicados. 
+Vemos que as cadeias aparentam convergência, conforme mencionado anteriormente os parâmetros de discriminação partiram apenas de valores positivos pois, ao permitir valores negativos juntamente com a interação entre o traço latente é possível que beta e theta tenham seus sinais invertidos.
+
+Em seguida apresentamos também os traços para os primeiros 4 thetas, que são o parâmetro de traço latente de cada um dos indivíduos.
 
 ```{r}
 bayesplot::mcmc_trace(fit.jags, pars = c("theta[1]","theta[2]","theta[3]","theta[4]"))
 ```
-
-Esse comportamento é, em parte, devido às prioris selecionadas, para um resultado mais satisfatório seria necessário utilizar outras distribuições que assumissem apenas valores positivos ou restringir os valores de beta.
 
 # Comparação entre os resultados
 
