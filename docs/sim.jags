@@ -15,6 +15,6 @@ model{
     ## Para o item it, i = 1, ..., Nitem
     for(it in 1:Nitem){
       alpha[it] ~ dnorm(0, 1)
-      beta[it] ~ dbeta(1, 1)
+      beta[it] ~ dnorm(0, 1)
     }
 }
