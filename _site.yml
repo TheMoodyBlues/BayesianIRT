@@ -8,6 +8,6 @@ navbar:
       href: Trabalho.html
     - text: "Referências"
       href: Links.html
-    - text: "Não Assista isso"
+    - text: "Stan"
       href: DONOTCLICKHERE.html
 output_dir: "docs"

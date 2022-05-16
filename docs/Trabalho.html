@@ -331,7 +331,7 @@ div.tocify {
   <a href="Links.html">Referências</a>
 </li>
 <li>
-  <a href="DONOTCLICKHERE.html">Não Assista isso</a>
+  <a href="DONOTCLICKHERE.html">Stan</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -691,7 +691,11 @@ invertidos.</p>
 que são o parâmetro de traço latente de cada um dos indivíduos.</p>
 <pre class="r"><code>bayesplot::mcmc_trace(fit.jags, pars = c(&quot;theta[1]&quot;,&quot;theta[2]&quot;,&quot;theta[3]&quot;,&quot;theta[4]&quot;))</code></pre>
 <p><img src="Trabalho_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
-<p>======= # Comparação entre os resultados</p>
+</div>
+</div>
+</div>
+<div id="comparação-entre-os-resultados" class="section level1">
+<h1>Comparação entre os resultados</h1>
 <pre class="r"><code>dificuldade &lt;- data.frame(&quot;item&quot; = paste0(&quot;i&quot;,1:13),
            &quot;mirt&quot; = order(coef.mirt$b),
            &quot;pscl&quot; = order(coef.pscl$Difficulty),
@@ -914,8 +918,6 @@ knitr::kable(discriminacao)</code></pre>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
 </div>
 
 

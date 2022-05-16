@@ -249,7 +249,6 @@ Em seguida apresentamos também os traços para os primeiros 4 thetas, que são 
 bayesplot::mcmc_trace(fit.jags, pars = c("theta[1]","theta[2]","theta[3]","theta[4]"))
 ```
 
-=======
 # Comparação entre os resultados
 
 ```{r}
