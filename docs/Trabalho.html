@@ -581,9 +581,8 @@ for(i in 1:13){
 </div>
 <div id="jags" class="section level2">
 <h2>JAGS</h2>
-<pre class="r"><code>library(&quot;rjags&quot;)
-
-data.list &lt;- data.f %&gt;% 
+<pre class="r"><code>library(&quot;rjags&quot;)</code></pre>
+<pre class="r"><code>data.list &lt;- data.f %&gt;% 
   as.data.frame() %&gt;% 
   rownames_to_column(var = &quot;id&quot;) %&gt;%
   pivot_longer(i1:i13,
@@ -596,6 +595,10 @@ data.list &lt;- data.f %&gt;%
 data.list$N &lt;- length(data.list$resp)
 data.list$Nid &lt;- length(unique(data.list$id))
 data.list$Nitem &lt;- length(unique(data.list$item))</code></pre>
+<p>Abaixo definimos o modelo, para melhor convergência e devido à
+natureza do modelo, utilizamos uma priori beta para o parâmetro beta,
+assim evitamos valores negativos de discriminação e a interação entre os
+parâmteros beta e theta fica menos turbulenta.</p>
 <pre class="r"><code>cat(&quot;model{
     
     ## cada resposta
@@ -613,7 +616,7 @@ data.list$Nitem &lt;- length(unique(data.list$item))</code></pre>
     ## Para o item it, i = 1, ..., Nitem
     for(it in 1:Nitem){
       alpha[it] ~ dnorm(0, 1)
-      beta[it] ~ dnorm(0, 1)
+      beta[it] ~ dbeta(1, 1)
     }
 }&quot;, file=&quot;sim.jags&quot;)</code></pre>
 <pre class="r"><code>sim.jags &lt;- jags.model(file = &quot;sim.jags&quot;,
@@ -629,35 +632,35 @@ jags.stats &lt;- sum.jags$statistics
 alphas &lt;- jags.stats[grepl(&quot;alpha&quot;, rownames(jags.stats)),]
 round(alphas,4)</code></pre>
 <pre><code>##              Mean     SD Naive SE Time-series SE
-## alpha[1]  -1.0324 0.0782   0.0014         0.0014
-## alpha[2]  -0.6060 0.0682   0.0012         0.0013
-## alpha[3]   0.0017 0.0779   0.0014         0.0014
-## alpha[4]  -2.8296 0.1851   0.0034         0.0038
-## alpha[5]  -0.7999 0.0938   0.0017         0.0018
-## alpha[6]   1.5787 0.0872   0.0016         0.0015
-## alpha[7]  -1.3430 0.0795   0.0015         0.0014
-## alpha[8]  -0.8548 0.0874   0.0016         0.0017
-## alpha[9]  -2.2238 0.1846   0.0034         0.0043
-## alpha[10] -0.4452 0.0688   0.0013         0.0013
-## alpha[11] -2.0352 0.1241   0.0023         0.0024
-## alpha[12] -1.9584 0.1138   0.0021         0.0021
-## alpha[13] -3.6027 0.2304   0.0042         0.0046</code></pre>
+## alpha[1]  -1.0410 0.0818   0.0015         0.0014
+## alpha[2]  -0.6146 0.0688   0.0013         0.0012
+## alpha[3]  -0.0057 0.0741   0.0014         0.0013
+## alpha[4]  -2.5826 0.1152   0.0021         0.0022
+## alpha[5]  -0.7222 0.0758   0.0014         0.0015
+## alpha[6]   1.5830 0.0895   0.0016         0.0016
+## alpha[7]  -1.3497 0.0790   0.0014         0.0014
+## alpha[8]  -0.8147 0.0768   0.0014         0.0014
+## alpha[9]  -1.6615 0.0905   0.0017         0.0015
+## alpha[10] -0.4559 0.0691   0.0013         0.0013
+## alpha[11] -1.9641 0.1028   0.0019         0.0019
+## alpha[12] -1.9728 0.1031   0.0019         0.0019
+## alpha[13] -3.4217 0.1673   0.0031         0.0031</code></pre>
 <pre class="r"><code>betas &lt;- jags.stats[grepl(&quot;beta&quot;, rownames(jags.stats)),]
 round(betas,4)</code></pre>
 <pre><code>##            Mean     SD Naive SE Time-series SE
-## beta[1]  0.2677 0.7604   0.0139         0.0019
-## beta[2]  0.1523 0.4389   0.0080         0.0016
-## beta[3]  0.3726 1.0558   0.0193         0.0025
-## beta[4]  0.4472 1.2868   0.0235         0.0038
-## beta[5]  0.4550 1.2852   0.0235         0.0029
-## beta[6]  0.1536 0.4385   0.0080         0.0020
-## beta[7]  0.1283 0.3769   0.0069         0.0018
-## beta[8]  0.3919 1.1125   0.0203         0.0027
-## beta[9]  0.6712 1.9231   0.0351         0.0056
-## beta[10] 0.1938 0.5573   0.0102         0.0017
-## beta[11] 0.3669 1.0459   0.0191         0.0027
-## beta[12] 0.2889 0.8373   0.0153         0.0025
-## beta[13] 0.3897 1.1329   0.0207         0.0039</code></pre>
+## beta[1]  0.7787 0.1012   0.0018         0.0019
+## beta[2]  0.4712 0.0885   0.0016         0.0017
+## beta[3]  0.9476 0.0447   0.0008         0.0008
+## beta[4]  0.9402 0.0523   0.0010         0.0010
+## beta[5]  0.9631 0.0340   0.0006         0.0006
+## beta[6]  0.4479 0.1109   0.0020         0.0021
+## beta[7]  0.3871 0.0982   0.0018         0.0018
+## beta[8]  0.9490 0.0453   0.0008         0.0008
+## beta[9]  0.9754 0.0235   0.0004         0.0004
+## beta[10] 0.5931 0.0949   0.0017         0.0018
+## beta[11] 0.9076 0.0723   0.0013         0.0013
+## beta[12] 0.8502 0.0961   0.0018         0.0018
+## beta[13] 0.8895 0.0923   0.0017         0.0017</code></pre>
 <pre class="r"><code>coef.jags &lt;- data.frame(&quot;Dificuldade&quot; =  alphas[,1], &quot;Discriminacao&quot; = betas[,1])
 
 x &lt;- seq(-6,6, by = 0.1)
@@ -669,13 +672,26 @@ for(i in 1:13){
        inlogit(coef.jags$Dificuldade[i],coef.jags$Discriminacao[i], x),
        type = &quot;l&quot;,
        main = paste(&quot;Item&quot;, i),
-       ylab = &quot;P(theta)&quot;)
+       ylab = &quot;P(theta)&quot;,
+       ylim = c(0,1))
 }</code></pre>
-<p><img src="Trabalho_files/figure-html/unnamed-chunk-12-1.png" width="672" /><img src="Trabalho_files/figure-html/unnamed-chunk-12-2.png" width="672" /></p>
-</div>
-</div>
-<div id="comparação-entre-os-resultados" class="section level1">
-<h1>Comparação entre os resultados</h1>
+<p><img src="Trabalho_files/figure-html/unnamed-chunk-13-1.png" width="672" /><img src="Trabalho_files/figure-html/unnamed-chunk-13-2.png" width="672" /></p>
+<div id="convergência" class="section level3">
+<h3>Convergência</h3>
+<p>Abaixo apresentamos os traços das cadeias para ambos os parâmetros
+dos dois primeiros itens:</p>
+<pre class="r"><code>bayesplot::mcmc_trace(fit.jags, pars = c(&quot;alpha[1]&quot;,&quot;beta[1]&quot;,&quot;alpha[2]&quot;,&quot;beta[2]&quot;))</code></pre>
+<p><img src="Trabalho_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>Vemos que as cadeias aparentam convergência, conforme mencionado
+anteriormente os parâmetros de discriminação partiram apenas de valores
+positivos pois, ao permitir valores negativos juntamente com a interação
+entre o traço latente é possível que beta e theta tenham seus sinais
+invertidos.</p>
+<p>Em seguida apresentamos também os traços para os primeiros 4 thetas,
+que são o parâmetro de traço latente de cada um dos indivíduos.</p>
+<pre class="r"><code>bayesplot::mcmc_trace(fit.jags, pars = c(&quot;theta[1]&quot;,&quot;theta[2]&quot;,&quot;theta[3]&quot;,&quot;theta[4]&quot;))</code></pre>
+<p><img src="Trabalho_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>======= # Comparação entre os resultados</p>
 <pre class="r"><code>dificuldade &lt;- data.frame(&quot;item&quot; = paste0(&quot;i&quot;,1:13),
            &quot;mirt&quot; = order(coef.mirt$b),
            &quot;pscl&quot; = order(coef.pscl$Difficulty),
@@ -713,7 +729,7 @@ knitr::kable(dificuldade)</code></pre>
 <td align="right">12</td>
 <td align="right">9</td>
 <td align="right">9</td>
-<td align="right">9</td>
+<td align="right">12</td>
 </tr>
 <tr class="even">
 <td align="left">i4</td>
@@ -727,7 +743,7 @@ knitr::kable(dificuldade)</code></pre>
 <td align="right">11</td>
 <td align="right">12</td>
 <td align="right">12</td>
-<td align="right">12</td>
+<td align="right">9</td>
 </tr>
 <tr class="even">
 <td align="left">i6</td>
@@ -791,7 +807,7 @@ knitr::kable(dificuldade)</code></pre>
            &quot;mirt&quot; = order(coef.mirt$a),
            &quot;pscl&quot; = order(-coef.pscl$`Discrimination D1`),
            &quot;mcmc&quot; = order(coef.mcmc$Discriminacao),
-           &quot;jags&quot; = order(-coef.jags$Discriminacao))
+           &quot;jags&quot; = order(coef.jags$Discriminacao))
 
 knitr::kable(discriminacao)</code></pre>
 <table>
@@ -810,94 +826,96 @@ knitr::kable(discriminacao)</code></pre>
 <td align="right">7</td>
 <td align="right">7</td>
 <td align="right">7</td>
-<td align="right">9</td>
+<td align="right">7</td>
 </tr>
 <tr class="even">
 <td align="left">i2</td>
 <td align="right">6</td>
 <td align="right">6</td>
 <td align="right">6</td>
-<td align="right">5</td>
+<td align="right">6</td>
 </tr>
 <tr class="odd">
 <td align="left">i3</td>
 <td align="right">2</td>
 <td align="right">2</td>
 <td align="right">2</td>
-<td align="right">4</td>
+<td align="right">2</td>
 </tr>
 <tr class="even">
 <td align="left">i4</td>
 <td align="right">10</td>
 <td align="right">10</td>
 <td align="right">10</td>
-<td align="right">8</td>
+<td align="right">10</td>
 </tr>
 <tr class="odd">
 <td align="left">i5</td>
 <td align="right">1</td>
 <td align="right">1</td>
 <td align="right">1</td>
-<td align="right">13</td>
+<td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">i6</td>
 <td align="right">12</td>
 <td align="right">12</td>
 <td align="right">12</td>
-<td align="right">3</td>
+<td align="right">12</td>
 </tr>
 <tr class="odd">
 <td align="left">i7</td>
 <td align="right">3</td>
 <td align="right">11</td>
 <td align="right">11</td>
-<td align="right">11</td>
+<td align="right">13</td>
 </tr>
 <tr class="even">
 <td align="left">i8</td>
 <td align="right">11</td>
 <td align="right">3</td>
 <td align="right">3</td>
-<td align="right">12</td>
+<td align="right">11</td>
 </tr>
 <tr class="odd">
 <td align="left">i9</td>
 <td align="right">8</td>
 <td align="right">8</td>
 <td align="right">13</td>
-<td align="right">1</td>
+<td align="right">4</td>
 </tr>
 <tr class="even">
 <td align="left">i10</td>
 <td align="right">5</td>
 <td align="right">13</td>
 <td align="right">8</td>
-<td align="right">10</td>
+<td align="right">3</td>
 </tr>
 <tr class="odd">
 <td align="left">i11</td>
 <td align="right">13</td>
 <td align="right">5</td>
 <td align="right">4</td>
-<td align="right">6</td>
+<td align="right">8</td>
 </tr>
 <tr class="even">
 <td align="left">i12</td>
 <td align="right">4</td>
 <td align="right">4</td>
 <td align="right">5</td>
-<td align="right">2</td>
+<td align="right">5</td>
 </tr>
 <tr class="odd">
 <td align="left">i13</td>
 <td align="right">9</td>
 <td align="right">9</td>
 <td align="right">9</td>
-<td align="right">7</td>
+<td align="right">9</td>
 </tr>
 </tbody>
 </table>
+</div>
+</div>
 </div>
 
 

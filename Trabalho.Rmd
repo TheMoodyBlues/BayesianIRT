@@ -144,6 +144,10 @@ for(i in 1:13){
 
 ```{r}
 library("rjags")
+```
+
+
+```{r, eval = F}
 
 data.list <- data.f %>% 
   as.data.frame() %>% 
@@ -229,7 +233,6 @@ for(i in 1:13){
 
 ```
 
-<<<<<<< HEAD
 ### Convergência
 
 Abaixo apresentamos os traços das cadeias para ambos os parâmetros dos dois primeiros itens:
@@ -247,7 +250,6 @@ bayesplot::mcmc_trace(fit.jags, pars = c("theta[1]","theta[2]","theta[3]","theta
 ```
 
 =======
->>>>>>> parent of 7cbbc57 (Ajustes conforme comentários aula)
 # Comparação entre os resultados
 
 ```{r}
@@ -264,7 +266,7 @@ discriminacao <- data.frame("item" = paste0("i",1:13),
            "mirt" = order(coef.mirt$a),
            "pscl" = order(-coef.pscl$`Discrimination D1`),
            "mcmc" = order(coef.mcmc$Discriminacao),
-           "jags" = order(-coef.jags$Discriminacao))
+           "jags" = order(coef.jags$Discriminacao))
 
 knitr::kable(discriminacao)
 ```
